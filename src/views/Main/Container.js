@@ -1,8 +1,8 @@
 import React, { PropTypes as T } from 'react'
-import { Nav, Navbar, NavItem, Header, Brand } from 'react-bootstrap'
+import { Nav, Navbar, NavItem, Header, Brand, NavDropdown, MenuItem } from 'react-bootstrap'
 import { Link } from 'react-router'
 import { LinkContainer } from 'react-router-bootstrap'
-import AuthService from 'utils/AuthService'
+import AuthService from '../../utils/AuthService'
 
 const auth = new AuthService()
 
@@ -49,9 +49,15 @@ export class Container extends React.Component {
               </LinkContainer>              
             }
             { auth.isAdmin() &&
-              <LinkContainer to={'/Admin'}>
-                <NavItem>Admin</NavItem>
-              </LinkContainer>              
+                <NavDropdown eventKey="4" title="Admin" id="nav-dropdown">
+                  <MenuItem eventKey="4.1" href="/admin/manage-employees">Manage Employees</MenuItem>
+                  <MenuItem divider />
+                  <MenuItem eventKey="4.2" href="/admin/manage-reports" >Manage Reports</MenuItem>
+                  <MenuItem divider />
+                  <MenuItem eventKey="4.3" href="/admin/manage-rosters">Rosters</MenuItem>
+                  <MenuItem divider />
+                  <MenuItem eventKey="4.4">Separated link</MenuItem>
+                </NavDropdown>
             }
           </Nav>
           <Nav pullRight>
@@ -62,7 +68,7 @@ export class Container extends React.Component {
             }
           </Nav>
         </Navbar>
-        <div className="container">
+        <div className="app-container">
           { children }
         </div>
       </div>

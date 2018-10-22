@@ -5,7 +5,6 @@ import { LOGIN_API_PATH } from "./constants";
 export const StubAPI = endpoint => {
 
     const isStub= isStubEndpoint(endpoint)
-    console.info(isStub)
 
     if(!isStub)
         return null
@@ -29,9 +28,6 @@ const mockLogin = () => {
 const isStubEndpoint = url => {
     let status = false
     API_STUB_ENDPOINTS.map((_stub, i) => {
-        console.info(url)
-        console.info(_stub)
-        console.info(_stub == url)
         if(_stub == url)
             status= true
     })

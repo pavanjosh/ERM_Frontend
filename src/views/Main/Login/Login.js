@@ -1,6 +1,6 @@
 import React, { PropTypes as T } from 'react'
 import {Tabs, Col, Tab, ButtonToolbar, Button, FormGroup, FormControl, ControlLabel, Alert} from 'react-bootstrap'
-import AuthService from 'utils/AuthService'
+import AuthService from '../../../utils/AuthService'
 import styles from './styles.module.css'
 
 export class Login extends React.Component {
@@ -30,16 +30,12 @@ export class Login extends React.Component {
     if (user && password) {
       this.props.auth.login(user, password)
         .then(result => {
-          console.info(result)
-          if (result.status && result.state != 200) {
-            this.setState({loginError: result.message})
+          if (result.httpStatus && result.httpStatus != 200) {
+            this.setState({loginError: result.errorMessage})
             return
           }
           this.props.auth.saveLoggedInUser(result)
-          this.handleRoleBasedNavigation(result.roles)
-          console.info('profile')
-          
-          console.info('profile')
+          this.handleRoleBasedNavigation(result.roles)          
         })
     }else{
       this.setState({loginError: "Please provide username and password"})      

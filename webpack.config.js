@@ -70,7 +70,7 @@ config.plugins = [
 // END ENV variables
 
 // CSS modules
-const cssModulesNames = `${isDev ? '[path][name]__[local]__' : ''}[hash:base64:5]`;
+//const cssModulesNames = `${isDev ? '[path][name]__[local]__' : ''}[hash:base64:5]z`;
 
 const matchCssLoaders = /(^|!)(css-loader)($|!)/;
 
@@ -85,7 +85,7 @@ const cssloader =
 const newloader = Object.assign({}, cssloader, {
   test: /\.module\.css$/,
   include: [src],
-  loader: cssloader.loader.replace(matchCssLoaders, `$1$2?modules&localIdentName=${cssModulesNames}$3`)
+  loader: 'style-loader!css-loader'
 })
 config.module.loaders.push(newloader);
 cssloader.test = new RegExp(`^(?!.*(module|bootstrap)).*${cssloader.test.source}`)

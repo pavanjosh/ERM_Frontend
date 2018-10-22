@@ -1,4 +1,4 @@
-  import { EventEmitter } from 'events'
+import { EventEmitter } from 'events'
 import { isTokenExpired } from './jwtHelper'
 import { browserHistory } from 'react-router'
 import jwtDecode from 'jwt-decode'
@@ -9,18 +9,15 @@ import { LOGIN_API_PATH } from './constants'
 
 import { StubAPI } from './Stub'
 
-export default class AuthService extends EventEmitter {
-  constructor() {
-    super()
-
+export default class AuthService   {
+  constructor() { 
     // binds login functions to keep this context
     this.login = this.login.bind(this)
   }
 
   _doAuthentication(endpoint, values) {
     let stubResponse = StubAPI(endpoint)
-    console.info(stubResponse)
-     if(stubResponse)
+    if(stubResponse)
       return Promise.resolve(stubResponse)
     return this.fetch(`${API_URL}${endpoint}`, {
       method: 'POST', 
@@ -34,7 +31,6 @@ export default class AuthService extends EventEmitter {
 
   login(user, password) {
     let response =  this._doAuthentication(LOGIN_API_PATH, { user, password })
-    console.info(response)
     return response
   }
 
@@ -53,7 +49,6 @@ export default class AuthService extends EventEmitter {
   }
 
   saveLoggedInUser(userObj) {
-    console.info(userObj)
     localStorage.setItem('loggedInUser', JSON.stringify(userObj))
   }
 
@@ -92,11 +87,9 @@ export default class AuthService extends EventEmitter {
   } 
 
   fetch(url,options) {    
-    console.info(url)
     let response = fetch(url, options)
     .then(response => response.json())
 
-    console.info(response)
     return response
   }
 }
