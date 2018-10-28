@@ -443,12 +443,11 @@ export class ManageRosters extends React.Component {
                  {this.renderPageAlert()} 
                 <Button bsStyle="primary" onClick ={this.addNewRoster}>Add New Roster</Button>
                 <BootstrapTable data={this.state.rostersData} height='40em' scrollTop={ 'Top' } striped hover condensed bordered={ false } search>
-                    <TableHeaderColumn width='20em'  isKey dataField='loginName'  dataSort={ true } >Login Name</TableHeaderColumn>
-                    <TableHeaderColumn width='20em'  dataField='name'  dataSort={ true } >Employee Name</TableHeaderColumn>
+                    <TableHeaderColumn width='20em' isKey dataField='name'  dataSort={ true } >Employee Name</TableHeaderColumn>
                     <TableHeaderColumn width='15em'  dataField='rosterStartDate'  dataSort={ true }>Roster Start Date</TableHeaderColumn>
                     <TableHeaderColumn width='15em'  dataField='rosterEndDate'  dataSort={ true }>Roster End Date</TableHeaderColumn>
                     <TableHeaderColumn width='8em'  dataField='location'  dataSort={ true }>Location</TableHeaderColumn>
-                    <TableHeaderColumn width='20em'  dataField='role'  dataSort={ true }>Role</TableHeaderColumn>
+                    <TableHeaderColumn width='20em'  dataField='roles'  dataSort={ true }>Roles</TableHeaderColumn>
                     <TableHeaderColumn dataField='edit' width='10em' dataFormat={ this.editBtn.bind(this)}></TableHeaderColumn>
                     <TableHeaderColumn dataField='edit' width='4em' dataFormat={ this.deleteBtn.bind(this)}></TableHeaderColumn>
                 </BootstrapTable>
