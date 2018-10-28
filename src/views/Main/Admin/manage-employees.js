@@ -29,16 +29,17 @@ import Select from 'react-select-plus';
     { value: 'XXL', label: 'XXL'}]      
     },
     {name : "active" , lable : "Status" ,sm : 10,  required : true, type : 'select',
-    data :[
-        { value: true, label: 'Active' },
-        { value: false, label: 'Inactive' }]      
-    }
+        data :[
+            { value: true, label: 'Active' },
+            { value: false, label: 'Inactive' }]      
+    },
+    {name : "loginName" , lable : "Login Name" , sm : 10}
  ]
 
  const EMP_LOGIN_PROPS = [
     {name : "loginName" , lable : "Login Name" , sm : 10, required : true},
     {name : "password" , lable : "Password" , sm : 10, required : true},
-
+             
  ]
 
  const OTHER_PROPS = [
@@ -143,20 +144,21 @@ export class ManageEmployees extends React.Component {
 
     proceedSaveEmpLoginData = () =>{
         if(this.state.selectedEmp){
+            console.info(selectedEmp)
             const selectedEmp = this.state.selectedEmp
             let data = {
+                id : selectedEmp.loginId,
                 employeeId : selectedEmp.id,
                 loginName : selectedEmp.loginName,
                 password : selectedEmp.password 
             }
 
-            if(this.isLoginNamePresent(selectedEmp.id)){
+            if(selectedEmp.empLoginFound){
                 EmployeeService.updateLogin(data).then(result => {
                     if (result.httpStatus && result.httpStatus != 200) {
                         this.setState({ formError: result.errorMessage})
                     }else{
-                        this.setState({ formSuccess: "Employee login created successfully"})
-                        this.getEmployees()
+                        this.setState({ formSuccess: "Employee login updated successfully"})
                     } 
                 })
             }else{
@@ -164,11 +166,14 @@ export class ManageEmployees extends React.Component {
                     if (result.httpStatus && result.httpStatus != 200) {
                         this.setState({ formError: result.errorMessage})
                     }else{
-                        this.setState({ formSuccess: "Employee login updated successfully"})
-                        this.getEmployees()
+                        let selectedEmp = {...this.state.selectedEmp}
+                        selectedEmp.loginId = result.id
+                        this.setState({ selectedEmp: selectedEmp})
+                        this.setState({ formSuccess: "Employee login created successfully"})
                     } 
                 })
             }
+            console.info(this.state)
          }
     }
 
@@ -206,8 +211,25 @@ export class ManageEmployees extends React.Component {
     
     
     showEditEmployeeLogin(emp, event) {
-        this.setState({ selectedEmp: {...emp}})
-        this.showLoginModal()
+
+        let selEmp = {...emp}
+        EmployeeService.getEmployeeLogin(selEmp).then(result => {
+            console.info(result)
+            if (result.status && result.state != 200 || 
+                result.httpStatus && result.httpStatus != 200 ) {
+                selEmp.empLoginFound = false   
+            }else{
+                selEmp.empLoginFound = true
+                selEmp.loginName = result.loginName
+                selEmp.password = result.password
+                selEmp.loginId = result.id
+            }
+
+            console.info(selEmp)
+            this.setState({ selectedEmp: selEmp})
+            this.showLoginModal()
+            
+          })
     }
     showDeleteEmployee(emp, event) {
         this.setState({ selectedEmp: emp })
@@ -238,8 +260,8 @@ export class ManageEmployees extends React.Component {
                     if (result.httpStatus && result.httpStatus != 200) {
                         this.setState({ formError: result.errorMessage})
                     }else{
-                        this.getEmployees()
                         this.setState({ formSuccess: "Employee added successfully"})
+                        this.getEmployees()
                     }                    
                   })
               }

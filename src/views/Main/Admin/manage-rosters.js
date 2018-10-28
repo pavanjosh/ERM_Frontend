@@ -15,7 +15,7 @@ import Select from 'react-select-plus';
     {name : "rosterStartDate" , lable : "Roster Start Date" ,sm:10 , type : 'date'},
     {name : "rosterEndDate" , lable : "Roster Start Date" ,sm:10 , type : 'date'},
     {name : "location" , lable : "Location" ,sm:10 },
-    {name : "role" , lable : "Role" ,sm:10, type : 'select',  data :[
+    {name : "role" , lable : "Role" ,sm:10, type : 'multi',  data :[
         { value: 'Supervisor', label: 'Supervisor' },
         { value: 'Covert', label: 'Covert' },
         { value: 'TSM', label: 'TSM' }]      
@@ -77,7 +77,7 @@ export class ManageRosters extends React.Component {
     } 
 
     proceedSaveRosterData = () =>{
-        if(this.state.selectedEmp){
+        if(this.sstate.selectedEmp){
             const selectedEmp = this.state.selectedEmp
             let data = {
                 employeeId : selectedEmp.id,
@@ -91,7 +91,7 @@ export class ManageRosters extends React.Component {
                         this.setState({ formError: result.errorMessage})
                     }else{
                         this.setState({ formSuccess: "Employee login created successfully"})
-                        this.getEmployees()
+                        this.loadRostersData()
                     } 
                 })
             }else{
@@ -100,22 +100,22 @@ export class ManageRosters extends React.Component {
                         this.setState({ formError: result.errorMessage})
                     }else{
                         this.setState({ formSuccess: "Employee login updated successfully"})
-                        this.getEmployees()
+                        this.loadRostersData()
                     } 
                 })
             }
          }
     } 
 
-    deleteEmployee =(e) =>{
+    deleteRoster =(e) =>{
         if(e) e.preventDefault()
         if(this.state.selectedEmp){
-            EmployeeService.deleteEmployee(this.state.selectedEmp.id).then(result => {
+            RostersService.deleteRoster(this.state.selectedEmp.id).then(result => {
                 if(result){
-                    this.setState({ pageSuccess: "Employee deleted successfully."})   
-                    this.getEmployees()
+                    this.setState({ pageSuccess: "Roster deleted successfully."})   
+                    this.loadRostersData()
                 }else{
-                    this.setState({ pageError: "Failed to delete employee. Please try again."})
+                    this.setState({ pageError: "Failed to delete Roster. Please try again."})
                 }
              })
         }
@@ -130,7 +130,7 @@ export class ManageRosters extends React.Component {
     }
 
     showEditRoster(emp, event) {
-        this.setState({ modalHeader: "Edit roster : "+emp.name })
+        this.setState({ modalHeader: "Edit Roster : "+emp.name })
         this.setState({ selectedEmp: emp })
         this.showModal()
     }
@@ -146,7 +146,7 @@ export class ManageRosters extends React.Component {
     }
 
     addNewRoster =  () =>{
-        this.setState({ modalHeader: "Add new roster" })
+        this.setState({ modalHeader: "Add new Roster" })
         this.setState({ selectedEmp: {} })
         this.showModal()
     }
@@ -217,7 +217,10 @@ export class ManageRosters extends React.Component {
     }
    }
 
-   handleSelectChange = (input , e) => {
+   handleMultiSelectChange = (input , e) => {
+      console.info(input) 
+      console.info(e) 
+      this.setState({"multiSelectVals":input})
     if(e){
       const value = e.value
       const name = input.name
@@ -256,6 +259,11 @@ export class ManageRosters extends React.Component {
    }
 
    renderSelect =(input, key) => { 
+    
+   }
+
+
+   renderMultiSelect =(input, key) => { 
     let name = input.name
     let requiredClass = input.required ? "input-required" :""
     return (
@@ -265,8 +273,9 @@ export class ManageRosters extends React.Component {
             name ={name} 
             options={input.data}
             placeholder= {"Please select "+ input.label}
-            value={this.state.selectedEmp[name]} 
-            onChange={this.handleSelectChange.bind(this, input)}
+            value={this.state.multiSelectVals} 
+            onChange={this.handleMultiSelectChange}
+            multi
           />
          </Col>
     )
@@ -327,6 +336,8 @@ export class ManageRosters extends React.Component {
                 empDeatils.push(this.renderDate(input,i))
             else if(input.type =='text')
                 empDeatils.push(this.renderText(input,i))
+            else if(input.type == 'multi')
+                empDeatils.push(this.renderMultiSelect(input,i))
             else
                 empDeatils.push(this.renderInput(input,i))
         }) 
@@ -338,7 +349,7 @@ export class ManageRosters extends React.Component {
             </Modal.Header>
             <Modal.Body>
               {this.renderAlert()} 
-              <h5>Roster Detais</h5>
+              <h4>Roster Detais</h4>
                <Row>
                 {empDeatils}                     
               </Row> 
@@ -360,11 +371,11 @@ export class ManageRosters extends React.Component {
             </Modal.Header>
             <Modal.Body>            
               <Col>
-                Are you sure you want to delete the employee : {this.state.selectedEmp.name}               
+                Are you sure you want to delete the Roaster for employee : {this.state.selectedEmp.name}               
               </Col> 
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={this.deleteEmployee.bind(this)}>Yes</Button>
+                <Button onClick={this.deleteRoster.bind(this)}>Yes</Button>
               <Button bsStyle="link" onClick={this.closeConfirmModal.bind(this)}>No</Button>
             </Modal.Footer>
           </Modal>

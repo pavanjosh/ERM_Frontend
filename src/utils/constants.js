@@ -8,6 +8,7 @@ export const SEARCH_EMPLOYEES_API_PATH = '/employee/{searchTerm}/{searchValue}'
 
 export const REG_LOGIN_API_PATH = '/login/register'
 export const UPDATE_LOGIN_API_PATH = '/login/update'
+export const GET_LOGIN_API_PATH = '/login/details/'
 
 export const GET_ROSTERS_API_PATH = '/rolesandrosters'
 export const MODIFY_ROSTERS_API_PATH = '/rolesandroster'

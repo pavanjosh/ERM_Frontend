@@ -51,8 +51,8 @@ class RostersService {
      })
     }
 
-    deleteRoster = (empId) => {
-      const apiUrl = `${API_URL}${MODIFY_EMPLOYEE_API_PATH}`+"/"+empId
+    deleteRoster = (rosterId) => {
+      const apiUrl = `${API_URL}${MODIFY_ROSTERS_API_PATH}`+"/"+rosterId
       return this.fetch(apiUrl, {
        method: 'DELETE', 
        headers: { 

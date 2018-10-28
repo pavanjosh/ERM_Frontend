@@ -9,6 +9,7 @@ import { API_URL } from './constants'
 import { 
   GET_EMPLOYEES_API_PATH,
   MODIFY_EMPLOYEE_API_PATH,
+  GET_LOGIN_API_PATH,
   REG_LOGIN_API_PATH,
   UPDATE_LOGIN_API_PATH } from './constants'
 
@@ -83,6 +84,19 @@ class EmployeeService {
          'Authorization': 'Bearer '+ this._getToken()
        },
        body: JSON.stringify(data)
+     })
+    }
+
+    getEmployeeLogin = (selectedEmp) => {
+      console.info(selectedEmp)
+      let apiPath = API_URL + GET_LOGIN_API_PATH + selectedEmp.loginName
+      return this.fetch(apiPath, {
+       method: 'GET', 
+       headers: { 
+         'Content-Type': 'application/json',
+         'Authorization': 'Bearer '+ this._getToken(),
+         'X-Employee-Id': selectedEmp.id,
+       } 
      })
     }
 
