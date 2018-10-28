@@ -8,7 +8,8 @@ import { API_URL } from './constants'
 
 import { 
   GET_ROSTERS_API_PATH,
-  MODIFY_ROSTERS_API_PATH  } from './constants'
+  MODIFY_ROSTERS_API_PATH ,
+  GET_LOGINS_API_PATH } from './constants'
 
 import { StubAPI } from './Stub'
  
@@ -29,6 +30,16 @@ class RostersService {
         })
       }
 
+      getAllLoginNames = () => {
+        return this.fetch(`${API_URL}${GET_LOGINS_API_PATH}`, {
+         method: 'GET', 
+         headers: { 
+           'Content-Type': 'application/json',
+           'Authorization': 'Bearer '+ this._getToken()
+         } 
+       })
+     }
+
     addRoster = (data) => {
         return this.fetch(`${API_URL}${MODIFY_ROSTERS_API_PATH}`, {
          method: 'POST', 
@@ -41,7 +52,7 @@ class RostersService {
      }
 
     updateRoster = (data) => {
-      return this.fetch(`${API_URL}${MODIFY_EMPLOYEE_API_PATH}`, {
+      return this.fetch(`${API_URL}${MODIFY_ROSTERS_API_PATH}`, {
        method: 'PUT', 
        headers: { 
          'Content-Type': 'application/json',

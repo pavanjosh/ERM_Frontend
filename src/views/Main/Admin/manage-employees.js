@@ -211,25 +211,31 @@ export class ManageEmployees extends React.Component {
     
     
     showEditEmployeeLogin(emp, event) {
-
         let selEmp = {...emp}
-        EmployeeService.getEmployeeLogin(selEmp).then(result => {
-            console.info(result)
-            if (result.status && result.state != 200 || 
-                result.httpStatus && result.httpStatus != 200 ) {
-                selEmp.empLoginFound = false   
-            }else{
-                selEmp.empLoginFound = true
-                selEmp.loginName = result.loginName
-                selEmp.password = result.password
-                selEmp.loginId = result.id
-            }
+        if(selEmp.loginName && selEmp.loginName != ''){
+            EmployeeService.getEmployeeLogin(selEmp).then(result => {
+                console.info(result)
+                if (result.status && result.state != 200 || 
+                    result.httpStatus && result.httpStatus != 200 ) {
+                    selEmp.empLoginFound = false   
+                }else{
+                    selEmp.empLoginFound = true
+                    selEmp.loginName = result.loginName
+                    selEmp.password = result.password
+                    selEmp.loginId = result.id
+                }
 
-            console.info(selEmp)
-            this.setState({ selectedEmp: selEmp})
-            this.showLoginModal()
-            
-          })
+                this.setState({ selectedEmp: selEmp}, 
+                    this.showLoginModal())
+                
+              })
+        }else{
+            selEmp.empLoginFound = false  
+            this.setState({ selectedEmp: selEmp}, 
+                this.showLoginModal())  
+        }
+        console.info(selEmp)
+        
     }
     showDeleteEmployee(emp, event) {
         this.setState({ selectedEmp: emp })

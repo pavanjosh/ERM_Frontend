@@ -12,6 +12,7 @@ export const GET_LOGIN_API_PATH = '/login/details/'
 
 export const GET_ROSTERS_API_PATH = '/rolesandrosters'
 export const MODIFY_ROSTERS_API_PATH = '/rolesandroster'
+export const GET_LOGINS_API_PATH = '/employees/forroster'
 
 
 export const API_STUB_ENDPOINTS = [

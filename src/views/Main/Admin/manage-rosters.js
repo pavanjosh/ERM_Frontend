@@ -11,11 +11,11 @@ import Select from 'react-select-plus';
 
  const EMP_PROPS = [
     {name : "loginName" , lable : "Login Name" , sm : 10, required : true, type : 'select'},
-    {name : "name" , lable : "Employee Name" , sm : 10, required : true, type : 'text'},
-    {name : "rosterStartDate" , lable : "Roster Start Date" ,sm:10 , type : 'date'},
-    {name : "rosterEndDate" , lable : "Roster Start Date" ,sm:10 , type : 'date'},
+    {name : "name" , lable : "Employee Name" , sm : 10,  type : 'text'},
+    {name : "rosterStartDate" , lable : "Roster Start Date" ,sm:10 , required : true, type : 'date'},
+    {name : "rosterEndDate" , lable : "Roster End Date" ,sm:10 , required : true, type : 'date'},
     {name : "location" , lable : "Location" ,sm:10 },
-    {name : "role" , lable : "Role" ,sm:10, type : 'multi',  data :[
+    {name : "roles" , lable : "Role" ,sm:10, type : 'multi', required : true, data :[
         { value: 'Supervisor', label: 'Supervisor' },
         { value: 'Covert', label: 'Covert' },
         { value: 'TSM', label: 'TSM' }]      
@@ -37,7 +37,25 @@ export class ManageRosters extends React.Component {
         this.loadRostersData()
         this.setState({ showModal: false })
         this.setState({ selectedEmp: {} })
+        this.loadLoginNames()
 
+    }
+
+    loadLoginNames = () =>{
+     RostersService.getAllLoginNames().then(result => {
+         console.info(result)
+        if (result.status && result.state != 200) {
+          this.setState({pageError: result.message})
+          return
+        }
+        if(result && result.length > 0){
+            let loginNames = []
+            result.map((emp, i) =>{
+                loginNames.push({value :emp.loginName, label: emp.loginName, data:emp})
+            })
+            this.setState({"loginNames":loginNames})
+        } 
+    })     
     }
 
     loadRostersData = () =>{
@@ -77,29 +95,26 @@ export class ManageRosters extends React.Component {
     } 
 
     proceedSaveRosterData = () =>{
-        if(this.sstate.selectedEmp){
+        if(this.state.selectedEmp){
             const selectedEmp = this.state.selectedEmp
-            let data = {
-                employeeId : selectedEmp.id,
-                loginName : selectedEmp.loginName,
-                password : selectedEmp.password 
-            }
+            console.info(selectedEmp)
+            console.info(selectedEmp.id)
 
-            if(this.isLoginNamePresent(selectedEmp.id)){
-                EmployeeService.updateLogin(data).then(result => {
+            if(selectedEmp.id && selectedEmp.id != ''){
+                RostersService.updateRoster(selectedEmp).then(result => {
                     if (result.httpStatus && result.httpStatus != 200) {
                         this.setState({ formError: result.errorMessage})
                     }else{
-                        this.setState({ formSuccess: "Employee login created successfully"})
+                        this.setState({ formSuccess: "Roster created successfully"})
                         this.loadRostersData()
                     } 
                 })
             }else{
-                EmployeeService.registerLogin(data).then(result => {
+                RostersService.addRoster(selectedEmp).then(result => {
                     if (result.httpStatus && result.httpStatus != 200) {
                         this.setState({ formError: result.errorMessage})
                     }else{
-                        this.setState({ formSuccess: "Employee login updated successfully"})
+                        this.setState({ formSuccess: "Roster updated successfully"})
                         this.loadRostersData()
                     } 
                 })
@@ -130,8 +145,17 @@ export class ManageRosters extends React.Component {
     }
 
     showEditRoster(emp, event) {
+        console.info(emp)
         this.setState({ modalHeader: "Edit Roster : "+emp.name })
         this.setState({ selectedEmp: emp })
+
+        if(emp.roles && emp.roles.length > 0){
+            let multiSelVals = []
+            emp.roles.map((role, i) =>{
+                multiSelVals.push({"value":role , "label" : role})
+            })
+            this.setState({"multiSelectVals":multiSelVals})
+        }
         this.showModal()
     }
     
@@ -210,25 +234,41 @@ export class ManageRosters extends React.Component {
 
     if (!(typeof date === 'string' || date instanceof String) && date.isValid()) {
         let selectedEmp = this.state.selectedEmp
-        selectedEmp[name] = date.format("DD/MM/YYYY")
+        selectedEmp[name] = date.format("YYYY-MM-DD")
         this.setState({"selectedEmp":selectedEmp})
     }else{
         this.setState({[name]:null})
     }
    }
 
-   handleMultiSelectChange = (input , e) => {
-      console.info(input) 
-      console.info(e) 
-      this.setState({"multiSelectVals":input})
-    if(e){
-      const value = e.value
-      const name = input.name
-      let selectedEmp = this.state.selectedEmp
-      selectedEmp[name] = value
-      this.setState({"selectedEmp":selectedEmp})
-     }
+   handleMultiSelectChange = (element , input) => { 
+      this.setState(
+          {"multiSelectVals":input}
+          , () => {
+            const multiSel = this.state.multiSelectVals   
+            let selectedEmp = this.state.selectedEmp
+            selectedEmp[element.name] =  multiSel.map((item,i) => {return item.value})
+            this.setState({"selectedEmp":selectedEmp})
+      
+            console.info(this.state.multiSelectVals)
+            console.info(this.state.selectedEmp)
+          })
    }
+
+   handleSelectChange = (input , e) => {
+    console.info(input) 
+    console.info(e) 
+    if(e){
+        const value = e.value
+        const name = input.name
+        let selectedEmp = this.state.selectedEmp
+        selectedEmp[name] = value
+        selectedEmp["name"] = e.data.name
+        selectedEmp["employeeId"] = e.data.id
+        this.setState({"selectedEmp":selectedEmp})
+    }
+    console.info(this.state.selectedEmp)
+    }
 
    renderInput = (input, i) =>{
     let name = input.name
@@ -246,20 +286,35 @@ export class ManageRosters extends React.Component {
    }
 
    renderText = (input, i) =>{
+       console.info('renderText')
+       console.info(input)
      return(
         <div> 
             <Col sm={6} key={"lebel"+i}>
                 <ControlLabel>{input.lable}</ControlLabel>
             </Col>
             <Col sm={6} key={"val"+i}>
-            <ControlLabel>{input.lable}</ControlLabel>
+            <ControlLabel>{this.state.selectedEmp[input.name]}</ControlLabel>
             </Col>
         </div>
     )  
    }
 
    renderSelect =(input, key) => { 
-    
+    let name = input.name
+    let requiredClass = input.required ? "input-required" :""
+    return (
+        <Col sm={input.sm} key={"selectprop"+key} className={requiredClass}>
+        <ControlLabel key="label">{input.lable}</ControlLabel>
+          <Select
+            name ={name} 
+            options={this.state.loginNames}
+            placeholder= {"Please select "+ input.lable}
+            value ={this.state.selectedEmp[name]} 
+            onChange={this.handleSelectChange.bind(this, input)}
+          />
+         </Col>
+    )
    }
 
 
@@ -272,9 +327,9 @@ export class ManageRosters extends React.Component {
           <Select
             name ={name} 
             options={input.data}
-            placeholder= {"Please select "+ input.label}
+            placeholder= {"Please select "+ input.lable}
             value={this.state.multiSelectVals} 
-            onChange={this.handleMultiSelectChange}
+            onChange={this.handleMultiSelectChange.bind(this, input)}
             multi
           />
          </Col>
